@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+
+<link rel="stylesheet" href="style/userList.css" th:href="@{/style.css}">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>Vishal</h1>
+
+<p th:text="${message}"></p> <h1 th:text="${currentUserName}">LoggedIn User</h1>
+<h3>All Users List</h3>
+
+
+<p th:text="${updatedMessage}"></p>
+
+<div th:switch="${details}">
+    <h2 th:case="null">No users yet!</h2>
+        <div th:case="*">
+            <!-- <h2>Users</h2> -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Mobile</th>
+                        <th>Status</th>
+                         <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${details}">
+                    <td th:text="${user.name}"></td>
+                    <td th:text="${user.mobile}"></td>
+                     <td th:text="${user.status}"></td>
+                   <td><a th:href="@{/edit/{id}(id=${user.id})}">Edit</a></td>
+                    <td><a th:href="@{/delete/{id}(id=${user.id})}">Delete</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>      
+    <p><a href="/signup">Add a new user</a></p>
+</div>
+</body>
+</html>
