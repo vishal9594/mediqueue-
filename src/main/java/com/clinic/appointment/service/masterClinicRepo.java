@@ -19,5 +19,6 @@ public interface masterClinicRepo extends JpaRepository<masterClinic,Long> {
 //	public masterClinic findCurrentSeq(LocalDate date);
 	
 	public List<masterClinic> findTopByDateAndIsdoneGreaterThanOrderByAppointmentseqDesc(LocalDate date,int status);
+	public List<masterClinic> findTopByDateAndIsdoneGreaterThanOrderByAppointmentseqAsc(LocalDate date,int status);
 	
 }

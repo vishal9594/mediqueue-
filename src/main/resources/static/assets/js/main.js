@@ -573,7 +573,15 @@
     $( "#datepicker" ).datepicker({
         dateFormat: "yy/mm/dd"
     });
-
+	
+	$("#dateForApp" ).datepicker
+	({
+        dateFormat: "dd/mm/yy",
+        
+        
+    });
+    $("#dateForApp").datepicker("setDate", new Date());
+	
     $(".search-open-btn").on("click", function () {
         $(".search__popup").addClass("search-opened");
     });
@@ -646,42 +654,73 @@ function statusbuttonChange(th){
      //console.log($(th).siblings())
    //$(th).siblings()[0].click();
    	$('.loading-form').show();
-	status = $(th).children().children()[0].textContent;
+	
+	/*status = $(th).children().children()[0].textContent;
 	
 	if(status =="Done"){
 		status =0;
 	}
 	else{
 		status =1;
+	}*/
+	status = $(th).attr("isdone")
+	if(status ==1 || status ==2){
+		status =0;
 	}
+	else{
+		status =1;
+	}
+	th_id= $(th).attr('appointment-id');
 $.ajax({
-                url: $($(th).siblings()[0]).attr('href'),
+                //url: $($(th).siblings()[0]).attr('href'),
+                url: "/update/"+th_id+"/"+status,
 				  type: "POST",
-				  data: {id : $(th).attr('appointment-id'),
+				  data: {id : th_id,
 				  		isdone: status	},
             }).done(function(data) {
                 $('.loading-form').hide();
                 console.log("done");
-                setTimeout(function(){
+                /*setTimeout(function(){
 					if(status==1){
-                	$(th).css("background","green");
+                	//$(th).css("background","green");
+                	$(th).attr("data-color","green");
                 	$(th).attr("isdone","1");
                 	}
                 else{
-                	$(th).css("background","");
+                	//$(th).css("background","");
+                	$(th).attr("data-color","none");
                 	$(th).attr("isdone","0");
                 	}
                 	$($(th).children().children()[1]).blur();
                 	
-				},300)
-                
+				},300)*/
+                if(status==0){
+					if(data.success==1){
+						$(th).attr("isdone","0");
+						
+						//$(th).find('span.text-Done').addClass("d-none")
+						
+						$(th).find('span.text-Pending').fadeIn();
+						$(th).find('span.text-Done').fadeOut();
+						$(th).find('span.text-Pending').removeClass("d-none");
+					}
+				}else if(status==1){
+					if(data.success==1){
+						$(th).attr("isdone","1");
+						
+						//$(th).find('span.text-Pending').addClass("d-none")
+						$(th).find('span.text-Pending').fadeOut();
+						$(th).find('span.text-Done').fadeIn();
+						$(th).find('span.text-Done').removeClass("d-none");
+					}
+				}
                 	
                var firstText= $(th).children().children()[0].textContent
                var secondText= $(th).children().children()[1].textContent
                
-               $(th).children().children()[0].textContent = secondText;
-               $(th).children().children()[1].textContent = firstText;
-               
+              // $(th).children().children()[0].textContent = secondText;
+               //$(th).children().children()[1].textContent = firstText;
+               $(th).parents().eq(2).find("[name^=remark]").focus();
                 
             }).fail(function(data) {
                 $('.loading-form').hide();
@@ -718,9 +757,269 @@ function getCurrentSeq(){
 
             });
 }
+function viewItem(th){
+	console.log(th)
+	$('.loading-form').show();
+	
+	if($("#viewImage"+$(th).attr('appointment-id')).attr("src") !=""){
+		Large($("#viewImage"+$(th).attr('appointment-id'))[0]);
+		$('.loading-form').hide();
+	}else{
+	
+	
+$.ajax({
+                url: "/viewItem",
+				  type: "POST",
+				  data: {id : $(th).attr('appointment-id'),
+				  		patient_id: $(th).attr('patient-id')	},
+            }).done(function(data) {
+                $('.loading-form').hide();
+                console.log("done")
+                
+                $("#viewImage"+$(th).attr('appointment-id')).attr("src","data:image/jpeg;base64,"+data.imgData+"");
+                
+                Large($("#viewImage"+$(th).attr('appointment-id'))[0]);
+                
+            }).fail(function(data) {
+                $('.loading-form').hide();
+                console.log("failed")
+
+            });
+            }
+}
+
+
+function deleteItem(th){
+	console.log(th)
+	$('.loading-form').show();
+	
+	appointment_id = $(th).attr('appointment-id')
+	
+$.ajax({
+                url: "/deleteItem",
+				  type: "POST",
+				  data: {id : $(th).attr('appointment-id'),
+				  		patient_id: $(th).attr('patient-id')	},
+            }).done(function(data) {
+                $('.loading-form').hide();
+                console.log("done")
+                $("#viewI"+appointment_id).addClass("d-none");
+					$("#deleteI"+appointment_id).addClass("d-none");
+                	$("input[type=file][appointment-id="+appointment_id+"]").removeClass("d-none");
+					$("input[type=file][appointment-id="+appointment_id+"]").val("")
+
+               
+               
+                
+            }).fail(function(data) {
+                $('.loading-form').hide();
+                console.log("failed")
+
+            });
+    }
+
+
+function getElementLeft(elm) 
+{
+    var x = 0;
+
+    //set x to elm’s offsetLeft
+    x = elm.offsetLeft;
+
+    //set elm to its offsetParent
+    elm = elm.offsetParent;
+
+    //use while loop to check if elm is null
+    // if not then add current elm’s offsetLeft to x
+    //offsetTop to y and set elm to its offsetParent
+
+    while(elm != null)
+    {
+        x = parseInt(x) + parseInt(elm.offsetLeft);
+        elm = elm.offsetParent;
+    }
+    return x;
+}
+
+function getElementTop(elm) 
+{
+    var y = 0;
+
+    //set x to elm’s offsetLeft
+    y = elm.offsetTop;
+
+    //set elm to its offsetParent
+    elm = elm.offsetParent;
+
+    //use while loop to check if elm is null
+    // if not then add current elm’s offsetLeft to x
+    //offsetTop to y and set elm to its offsetParent
+
+    while(elm != null)
+    {
+        y = parseInt(y) + parseInt(elm.offsetTop);
+        elm = elm.offsetParent;
+    }
+
+    return y;
+}
+function Large(obj)
+{
+    var imgbox=document.getElementById("imgbox");
+    imgbox.style.visibility='visible';
+    var img = document.createElement("img");
+    img.id="zoomedImg"
+    img.src=obj.src;
+    //img.style.width='400px';
+    img.style.height='-webkit-fill-available';
+    
+    if(img.addEventListener){
+        img.addEventListener('mouseout',Out,false);
+    } else {
+        img.attachEvent('onmouseout',Out);
+    }             
+    imgbox.innerHTML='';
+    imgbox.appendChild(img);
+//    imgbox.style.left=(getElementLeft(obj)-50) +'px';
+     imgbox.style.left='0px';
+//    imgbox.style.top=(getElementTop(obj)-50) + 'px';
+//imgbox.style.top='100%';
+
+
+$(imgbox).css('position-area' , 'center');
+$(".section-space").css("opacity",0.5);
+}
+function Out()
+{
+    document.getElementById("imgbox").style.visibility='hidden';
+    $(".section-space").css("opacity","unset")
+}
+
+function writeItem(th){
+	appointment_id = $(th).attr('appointment-id');
+	canvasRender(appointment_id);
+}
+
+function getTouchPos(canvasDom, touchEvent) {
+        const rect = canvasDom.getBoundingClientRect();
+        return {
+            x: touchEvent.touches[0].clientX - rect.left,
+            y: touchEvent.touches[0].clientY - rect.top
+        };
+    }
+
+function canvasRender(app_id){
+	
+	
+//	$("#signatureCanvas"+app_id).removeClass("d-none");
+	$("#signatureCanvas").removeClass("d-none");
+	$("#captureButton"+app_id).removeClass("d-none");
+	
+//	const canvas = document.getElementById("signatureCanvas"+app_id);
+ 	const canvas = document.getElementById("signatureCanvas");
+ 	canvas.style.visibility='visible';
+     const ctx = canvas.getContext("2d");
+     let drawing = false;
+	
+	
+	let lastX = 0;
+    let lastY = 0;
+		
+	
+     canvas.addEventListener("mousedown", (e) => {
+       drawing = true;
+       ctx.beginPath();
+       ctx.moveTo(e.offsetX, e.offsetY);
+     });
+	
+	canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Prevent scrolling/zooming
+        isDrawing = true;
+        const touch = getTouchPos(canvas, e);
+        [lastX, lastY] = [touch.x, touch.y];
+        ctx.beginPath(); // Start a new path for each new stroke
+        ctx.moveTo(lastX, lastY);
+    }, false); // Use capture phase if needed, but false is usually fine
+
+	// Event listener for when the touch moves
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault(); // Prevent scrolling/zooming
+        if (!isDrawing) return;
+
+        const touch = getTouchPos(canvas, e);
+        ctx.lineTo(touch.x, touch.y);
+        ctx.stroke();
+        [lastX, lastY] = [touch.x, touch.y]; // Update last position for continuous line
+    }, false);
+
+    // Event listener for when the touch ends
+    canvas.addEventListener('touchend', () => {
+        isDrawing = false;
+    }, false);
+
+    // Event listener for when the touch is cancelled (e.g., system interrupt)
+    canvas.addEventListener('touchcancel', () => {
+        isDrawing = false;
+    }, false);
+	
+     canvas.addEventListener("mousemove", (e) => {
+       if (!drawing) return;
+       ctx.lineTo(e.offsetX, e.offsetY);
+       ctx.stroke();
+     });
+//	pointermove
+	
+		
+     canvas.addEventListener("mouseup", () => {
+       drawing = false;
+     });
+    
+//    const clearBtn = document.getElementById("clearButton"+app_id); 
+//    clearBtn.addEventListener('click', () => {
+//        ctx.clearRect(0, 0, canvas.width, canvas.height);
+//    });
+    
+    
+
+     const captureButton = document.getElementById("captureButton"+app_id);
+     captureButton.addEventListener("click", () => {
+    	 const dataURL = canvas.toDataURL('image/png'); // Get image data as PNG
+        
+       const signatureImage = dataURL;
+       console.log("Signature Image Data:", signatureImage);
+       document.getElementById("signatureCanvas").style.visibility='hidden';
+ 	
+       
+     /*  if(document.getElementById("canvasImg")){
+       	document.getElementById("canvasImg").remove();
+       }
+       
+       
+       
+       var imgbox=document.getElementById("imgbox");
+       imgbox.style.visibility='visible';
+       var img = document.createElement("img");
+       img.id="canvasImg"
+       img.src= signatureImage;
+       //img.style.width='400px';
+       img.style.height='-webkit-fill-available';
+       imgbox.appendChild(img);
+       
+    	imgbox.style.visibility='visible';*/
+       
+      // Large(img);
+       // You can send this image data to a server or store it
+     });
+}
+
+$(document).on("click",function(e){
+//    console.log(e.target)
+if(e.target.id!="zoomedImg"){
+	//Out();
+}
+})
 
 function uploadPrescription(th){
-	console.log(th);
 	$('.loading-form').show();
 	var file_data = th.files[0];   
     var form_data = new FormData();
@@ -744,15 +1043,33 @@ function uploadPrescription(th){
                 console.log("done")
                 
                 if(data.success =="1"){
-				if($('[name=statusbutton][appointment-id='+appointment_id+']').css("background") !="green"){
-                $('[name=statusbutton][appointment-id='+appointment_id+']').css("background","green");
+				//if($('[name=statusbutton][appointment-id='+appointment_id+']').css("background") !="green"){
+                //$('[name=statusbutton][appointment-id='+appointment_id+']').css("background","green");
 	                var statusBtn = $('[name=statusbutton][appointment-id='+appointment_id+']');
 	                var firstText= $(statusBtn).children().children()[0].textContent
 	               var secondText= $(statusBtn).children().children()[1].textContent
-	               $(statusBtn).attr("isdone","2");
-	               $(statusBtn).children().children()[0].textContent = secondText;
-	               $(statusBtn).children().children()[1].textContent = firstText;
-               }
+	               $(statusBtn).attr("isdone","2"); 
+	              // $(statusBtn).children().children()[0].textContent = secondText;
+	               //$(statusBtn).children().children()[1].textContent = firstText;
+	               
+	               
+						
+//						$(th).find('span.text-Pending').fadeIn();
+//						$(th).find('span.text-Done').fadeOut();
+//						$(th).find('span.text-Pending').removeClass("d-none");
+//					
+					
+					$("#viewI"+appointment_id).removeClass("d-none");
+					$("#deleteI"+appointment_id).removeClass("d-none");
+                	$("input[type=file][appointment-id="+appointment_id+"]").addClass("d-none");
+//	               		$(th).find('span.text-Pending').fadeOut();
+//						$(th).find('span.text-Done').fadeIn();
+//						$(th).find('span.text-Done').removeClass("d-none");
+
+						$("#status"+appointment_id).find('span.text-Pending').fadeOut();
+						$("#status"+appointment_id).find('span.text-Done').fadeIn();
+						$("#status"+appointment_id).find('span.text-Done').removeClass("d-none");
+              // }
                }
                 
             }).fail(function(data) {
@@ -850,7 +1167,9 @@ data.push({name: "name", value: fullName});
             });
         }, 1000);
     });
+
 	
+
 
 function remarksUpdate(th){
 	$('.loading-form').show();

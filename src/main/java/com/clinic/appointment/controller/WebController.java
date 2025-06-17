@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URLConnection;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -310,6 +311,103 @@ public class WebController {
         	return map;
 		}
 		
+		
+		@RequestMapping(value="/viewItem", method=RequestMethod.POST)
+		  @ResponseBody
+		  public Map<String, Object> viewItem(@RequestParam String id,@RequestParam String patient_id) {
+				
+			System.out.println(id);
+			//System.out.println(file.getOriginalFilename());
+			
+			
+					
+			
+			patientPrescription patientPrescription= new patientPrescription();
+			patientPrescription.setPatientId(Long.valueOf(patient_id));
+			patientPrescription.setPrescriptionId(Long.valueOf(id));
+			
+			/*
+			 * try { patientPrescription.setPatientPrescription(file.getBytes()); } catch
+			 * (IOException e) { // TODO Auto-generated catch block e.printStackTrace(); }
+			 */
+			 LocalDate datel = null;
+			 datel = datel.now();
+			patientPrescription.setDateAdded(datel); 
+			
+			patientPrescription = patientPrescriptionService.getPrescription(patientPrescription);
+			
+			//System.out.println(patientPrescription);
+			
+			Map<String, Object> map = new HashMap<>();
+	      	
+			
+			map.put("imgData", Base64.getEncoder().encodeToString(patientPrescription.getPatientPrescription()));
+			map.put("success", "1");
+			//File f = new File("D:\\Projects\\Clinic_app\\files\\"+patient_id+"_"+id+"_"+datel+file.getOriginalFilename());
+			/*
+			 * try { file.transferTo(f); } catch (IllegalStateException e) { // TODO
+			 * Auto-generated catch block e.printStackTrace(); } catch (IOException e) { //
+			 * TODO Auto-generated catch block e.printStackTrace(); }
+			 */
+			
+			
+			
+      	return map;
+		}
+		
+		@RequestMapping(value="/deleteItem", method=RequestMethod.POST)
+		  @ResponseBody
+		  public Map<String, Object> deleteItem(@RequestParam String id,@RequestParam String patient_id) {
+				
+			System.out.println(id);
+			//System.out.println(file.getOriginalFilename());
+			
+			Map<String, Object> map = new HashMap<>();
+	      	
+					
+			
+			patientPrescription patientPrescription= new patientPrescription();
+			patientPrescription.setPatientId(Long.valueOf(patient_id));
+			patientPrescription.setPrescriptionId(Long.valueOf(id));
+			
+			/*
+			 * try { patientPrescription.setPatientPrescription(file.getBytes()); } catch
+			 * (IOException e) { // TODO Auto-generated catch block e.printStackTrace(); }
+			 */
+			 LocalDate datel = null;
+			 datel = datel.now();
+			patientPrescription.setDateAdded(datel); 
+			try {
+			 patientPrescriptionService.deleteByPrescriptionId(patientPrescription);
+			}
+			catch(Exception e) {
+				 map.put("deleted", "0");
+			}
+			 try {
+			 	masterClinic masterClinicObj = new masterClinic();
+				masterClinicObj = masterClinicService.findById(patientPrescription.getPrescriptionId());
+				masterClinicObj.setIsdone(1);
+				masterClinicService.save(masterClinicObj);
+			 }
+			 catch(Exception e) {
+				 map.put("statusChanged", "0");
+			 }
+			//System.out.println(patientPrescription);
+			
+			
+			
+			map.put("success", "1");
+			//File f = new File("D:\\Projects\\Clinic_app\\files\\"+patient_id+"_"+id+"_"+datel+file.getOriginalFilename());
+			/*
+			 * try { file.transferTo(f); } catch (IllegalStateException e) { // TODO
+			 * Auto-generated catch block e.printStackTrace(); } catch (IOException e) { //
+			 * TODO Auto-generated catch block e.printStackTrace(); }
+			 */
+			
+			
+			
+    	return map;
+		}
 		
 		@RequestMapping(value="/getCurrentSeq", method=RequestMethod.POST)
 		  @ResponseBody

@@ -286,6 +286,64 @@ width: 130px !important;
     border-radius: 10px !important;
     height: 40px;
 }
+.Statusbtn[isdone="1"]{
+	background-color: green !important;
+}
+.Statusbtn[isdone="2"]{
+	background-color: green !important;
+}
+.Statusbtn[isdone="0"]{
+	background-color : var(--rr-theme-primary) !important;
+}
+
+#imgbox 
+{
+    vertical-align : middle;
+    position : absolute;
+    border: 1px solid #999;
+/*     background : #FFFFFF;  */
+background : transparent; 
+width:-webkit-fill-available;
+    filter: Alpha(Opacity=100);
+    visibility : hidden;
+    height : 600px;
+    /* width : 200px; */
+    z-index : 50;
+    overflow : hidden;
+    text-align : center;
+}
+#canvasbox 
+{
+    vertical-align : middle;
+    position : absolute;
+    border: 1px solid #999;
+/*     background : #FFFFFF;  */
+background : transparent; 
+width:-webkit-fill-available;
+    filter: Alpha(Opacity=100);
+    visibility : hidden;
+    height : 600px;
+    /* width : 200px; */
+    z-index : 50;
+    overflow : hidden;
+    text-align : center;
+}
+.canvas
+{
+    vertical-align : middle;
+    position : absolute;
+    border: 1px solid #999;
+    background : #FFFFFF; 
+    
+    filter: Alpha(Opacity=100);
+    visibility : hidden;
+    height : 600px;
+    /* width : 200px; */
+    z-index : 50;
+    overflow : hidden;
+    text-align : center;
+    position-area : center;
+}
 
 /* transform */
 .doctor-details__form-input-select .nice-select::after, .take-appointment-3__form-input-select .nice-select::after, .pricing-appointment__form-select .nice-select::after, .rr__faq-2 .accordion-button::after, .appointment-2__form-input-select .nice-select::after, .take-appointment__form-input-select .nice-select::after, .rr__faq .accordion-button::after {

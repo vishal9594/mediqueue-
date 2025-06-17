@@ -260,9 +260,17 @@
     
 	</br>
 	<div class="container">
-	<h5>Today's total appointments: <span th:text="${todaysAllDataSize}"></span></h5> 
+	<h5 class="d-inline">Today's total appointments: <span th:text="${todaysAllDataSize}"></span></h5> 
+	<input id="dateForApp" name="dateForApp" class="d-inline shadow" type="text" style="width: 150px; float: right;">
+		
 	</div>
 	
+	<div id="imgbox" class="shadow">		
+	</div>
+	
+	<div id="canvasbox" class="shadow">
+		<canvas  class="d-none canvas" th:id="signatureCanvas" width="400" height="550"></canvas>
+	</div>
 <div sec:authorize="hasRole('USER')">Text visible to user.</div>
     <div sec:authorize="hasRole('ADMIN')">Text visible to admin.</div>
     <div sec:authorize="isAuthenticated()">Text visible only to authenticated users.</div>
@@ -276,6 +284,7 @@
 		    <h2 th:case="null">No appointments yet!</h2>
 		        <div th:case="*">
 		            <!-- <h2>Users</h2> -->
+		           
 		            <table class="table table-bordered table-responsive">
                 <thead>
                     <tr>
@@ -296,8 +305,10 @@
                      	<span th:case="0">
 						<button th:id="status+${appointment.id}" th:isdone="${appointment.isdone}" th:appointment-id="${appointment.id}" th:name="statusbutton" th:onclick="statusbuttonChange(this)" type="button" class="rr-btn rr-btn__primary-color mt-0 w-50 Statusbtn">
                                     <span class="btn-wrap">
-                                        <span class="text-one w-60p">Pending</span>
-                                        <span class="text-two w-60p">Done</span>
+                                        <!-- <span class="text-one w-60p">Pending</span>
+                                        <span class="text-two w-60p">Done</span> -->
+                                       <span class="text-Pending ">Pending</span>
+                                        <span class="text-Done d-none">Done</span>
                                     </span>
                                 </button>
                            <!-- <a  th:href="@{/update/{id}/{isDone}(id=${appointment.id},isDone=${appointment.isdone})}" th:text="Update"></a> -->
@@ -305,10 +316,12 @@
 						</span>
                      	<span th:case="1">
                      	
-                     	<button th:id="status+${appointment.id}" th:isdone="${appointment.isdone}" th:appointment-id="${appointment.id}" th:name="statusbutton" th:onclick="statusbuttonChange(this)" style="background: green;" type="button" class="rr-btn rr-btn__primary-color mt-0 w-50 Statusbtn">
+                     	<button th:id="status+${appointment.id}" th:isdone="${appointment.isdone}" th:appointment-id="${appointment.id}" th:name="statusbutton" th:onclick="statusbuttonChange(this)" type="button" class="rr-btn rr-btn__primary-color mt-0 w-50 Statusbtn">
                                     <span class="btn-wrap">
-                                        <span class="text-one w-60p">Done</span>
-                                        <span class="text-two w-60p">Pending</span>
+                                        <!-- <span class="text-one w-60p">Done</span>
+                                        <span class="text-two w-60p">Pending</span> -->
+                                        <span class="text-Pending d-none">Pending</span>
+                                        <span class="text-Done ">Done</span>
                                     </span>
                                 </button>
                      	<!-- style="display:none" -->
@@ -319,18 +332,20 @@
                      	
                      	<button th:id="status+${appointment.id}" th:isdone="${appointment.isdone}" th:appointment-id="${appointment.id}" th:name="statusbutton" th:onclick="statusbuttonChange(this)" style="background: green;" type="button" class="rr-btn rr-btn__primary-color mt-0 w-50 Statusbtn">
                                     <span class="btn-wrap">
-                                        <span class="text-one w-60p">Done</span>
-                                        <span class="text-two w-60p">Pending</span>
+                                        <!-- <span class="text-one w-60p">Done2</span>
+                                        <span class="text-two w-60p">Pending</span> -->
+                                        <span class="text-Pending d-none">Pending</span>
+                                        <span class="text-Done ">Done</span>
                                     </span>
                                 </button>
-                     	<!-- style="display:none" -->
+                     	<!-- //2 is done and prescription uploaded style="display:none" -->
                      	<a  th:id="update+${appointment.id}" th:href="@{/update/{id}/{isDone}(id=${appointment.id},isDone=0)}" ></a>     
                      	</span>
                      	
                      </td>
                      
                      <td style="width:180px">
-                   		<input th:id="${appointment.id}" th:class="border-light-subtle" maxlength="100" style="width:100%" onchange=remarksUpdate(this) th:value="${appointment.remarks}"></input>
+                   		<input th:id="${appointment.id}" th:name="remark+${appointment.id}" th:class="border-light-subtle" maxlength="100" style="width:100%" onchange=remarksUpdate(this) th:value="${appointment.remarks}"></input>
                    </td>
                      
                    <td style="width:20px;align-content: center;" th:switch="${appointment.patient_id}">
@@ -342,12 +357,27 @@
 	                   		
 	                   		<span th:switch="${appointment.isdone}">	
 	                   			<span th:case="2"> <!-- 2 is prescription is uploaded -->
-	                   				<p>Uploaded</p>
-	                   				<span>Change</span>
+	                   				<!-- <span>Uploaded</span> -->
+	                   				<span th:id="viewI+${appointment.id}" class="fa fa-eye" onclick=viewItem(this) th:patient-id="${appointment.patient_id}" th:appointment-id="${appointment.id}" title="Click to view"></span>
+	                   				
+	                   				<span th:id="deleteI+${appointment.id}" class="fa fa-trash" onclick=deleteItem(this) th:patient-id="${appointment.patient_id}" th:appointment-id="${appointment.id}"  title="Click to delete"></span>
 	                   				<input type="file" class="form-control form-control-sm d-none" th:onchange="uploadPrescription(this)" th:patient-id="${appointment.patient_id}" th:appointment-id="${appointment.id}" th:name="uploadbutton" th:data-href="@{/upload/{id}(id=${appointment.patient_id})}" />
+	                   				<img src="" class="d-none" th:id="viewImage+${appointment.id}" onmouseover="Large(this)" style="height: 0px;">
+	                   				
+	                   				
 	                   			</span>
 	                   			<span th:case="*" >
-	                   		<input type="file" th:onchange="uploadPrescription(this)" th:patient-id="${appointment.patient_id}" th:appointment-id="${appointment.id}" th:name="uploadbutton" th:data-href="@{/upload/{id}(id=${appointment.patient_id})}" class="form-control form-control-sm"/>
+	                   				<span th:id="viewI+${appointment.id}" class="fa fa-eye d-none" onclick=viewItem(this) th:patient-id="${appointment.patient_id}" th:appointment-id="${appointment.id}" title="Click to view"></span>
+	                   				
+	                   				<span th:id="deleteI+${appointment.id}" class="fa fa-trash d-none" onclick=deleteItem(this) th:patient-id="${appointment.patient_id}" th:appointment-id="${appointment.id}"  title="Click to delete"></span>
+	                   				
+	                   				<input type="file" th:onchange="uploadPrescription(this)" th:patient-id="${appointment.patient_id}" th:appointment-id="${appointment.id}" th:name="uploadbutton" th:data-href="@{/upload/{id}(id=${appointment.patient_id})}" class="form-control form-control-sm"/>
+                   					<img src="" class="d-none" th:id="viewImage+${appointment.id}" onmouseover="Large(this)" style="height: 0px;">
+                   					
+                   					<span th:id="writeI+${appointment.id}" class="fa fa-pen" onclick=writeItem(this) th:patient-id="${appointment.patient_id}" th:appointment-id="${appointment.id}" title="Click to write"></span>
+<!--                    					 <canvas class="d-none" th:id="signatureCanvas+${appointment.id}" width="400" height="550"></canvas> -->
+   									 <button class="d-none" th:id="captureButton+${appointment.id}">Capture</button>
+                   					
                    				</span>
                    			</span>
                    		</span>
@@ -372,6 +402,11 @@
 <!-- <div class="contact__map contact__map-footer_up">
    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15070.677360595922!2d73.0995525!3d19.2096394!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7958ef72d8707%3A0x84bf6ab96e280b08!2sDombivli%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1720876897240!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="true" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
 </div> -->
+
+
+  
+
+   
 
 
 <!-- Footer area start -->

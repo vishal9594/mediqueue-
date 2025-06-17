@@ -17,7 +17,8 @@ public interface patientPrescriptionRepo extends JpaRepository<patientPrescripti
 	
 	//public List<patientPrescription> findByDate(LocalDate date);
 //	public List<patientPrescription> findByPatientId(Long patientId);
-//	public List<patientPrescription> findByPrescriptionId(Long patientId);
+	public List<patientPrescription> findByPrescriptionId(Long patientId);
 	
+	public void deleteByPrescriptionId(Long prescriptionId);
 //	Optional<patientPrescription> findByEmail(String email);
 }
